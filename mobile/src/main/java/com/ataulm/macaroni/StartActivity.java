@@ -1,18 +1,17 @@
 package com.ataulm.macaroni;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 
 public class StartActivity extends BaseActivity {
 
-    private static final int REQUEST_CODE = 123;
+    private static final int REQUEST_CODE_PICK_DIR = 456;
+    private static final int REQUEST_CODE_PICK_DOC = 123;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -21,33 +20,40 @@ public class StartActivity extends BaseActivity {
     }
 
     public void findAudio(View view) {
+        startActivityForResult(pickDocIntent(), REQUEST_CODE_PICK_DOC);
+    }
+
+    private static Intent pickDocIntent() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("audio/*");
-        startActivityForResult(intent, REQUEST_CODE);
+        return intent;
+    }
+
+    public void findAudioDir(View view) {
+        startActivityForResult(pickDirIntent(), REQUEST_CODE_PICK_DIR);
+    }
+
+    private static Intent pickDirIntent() {
+        return new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE) {
-            onActivityResult(resultCode, data);
+        if (resultCode == RESULT_OK && data != null) {
+            onActivityResult(requestCode, data.getData());
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
-    private void onActivityResult(int resultCode, @Nullable Intent data) {
-        if (resultCode == Activity.RESULT_OK && data != null) {
-            onActivityResult(data);
-        } else {
-            toast("resultCode ok? " + (resultCode == RESULT_OK) + " data ok? " + (data != null));
+    private void onActivityResult(int requestCode, Uri data) {
+        if (requestCode == REQUEST_CODE_PICK_DIR) {
+            // TODO: https://github.com/googlesamples/android-DirectorySelection
+            log("dir: " + data);
+        } else if (requestCode == REQUEST_CODE_PICK_DOC) {
+            dumpImageMetaData(data);
         }
-    }
-
-    private void onActivityResult(Intent data) {
-        Uri uri = data.getData();
-        toast(uri.toString());
-        dumpImageMetaData(uri);
     }
 
     public void dumpImageMetaData(Uri uri) {
@@ -66,7 +72,7 @@ public class StartActivity extends BaseActivity {
             // Note it's called "Display Name".  This is
             // provider-specific, and might not necessarily be the file name.
             String displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-            Log.i("macaroni", "Display Name: " + displayName);
+            log("Display Name: " + displayName);
 
             int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
             // If the size is unknown, the value stored is null.  But since an
@@ -83,7 +89,7 @@ public class StartActivity extends BaseActivity {
             } else {
                 size = "Unknown";
             }
-            Log.i("macaroni", "Size: " + size);
+            log("Size: " + size);
         }
     }
 
