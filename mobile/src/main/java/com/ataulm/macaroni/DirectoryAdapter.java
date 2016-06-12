@@ -9,10 +9,12 @@ import java.util.List;
 class DirectoryAdapter extends RecyclerView.Adapter<DirectoryItemViewHolder> {
 
     private final StableStringToIdMapper idMapper = new StableStringToIdMapper();
+    private final DirectoryItemViewHolder.Listener listener;
 
     private List<DocumentInfo> items;
 
-    public DirectoryAdapter() {
+    public DirectoryAdapter(DirectoryItemViewHolder.Listener listener) {
+        this.listener = listener;
         super.setHasStableIds(true);
     }
 
@@ -29,7 +31,7 @@ class DirectoryAdapter extends RecyclerView.Adapter<DirectoryItemViewHolder> {
     @Override
     public void onBindViewHolder(DirectoryItemViewHolder holder, int position) {
         DocumentInfo item = items.get(position);
-        holder.bind(item);
+        holder.bind(item, listener);
     }
 
     @Override

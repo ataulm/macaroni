@@ -28,7 +28,12 @@ public class StartActivity extends BaseActivity {
         setContentView(R.layout.activity_start);
         ButterKnife.bind(this);
 
-        directoryAdapter = new DirectoryAdapter();
+        directoryAdapter = new DirectoryAdapter(new DirectoryItemViewHolder.Listener() {
+            @Override
+            public void onClick(DocumentInfo item) {
+                toast("clicked " + item.getName());
+            }
+        });
         directoriesView.setLayoutManager(new LinearLayoutManager(this));
         directoriesView.setAdapter(directoryAdapter);
     }
