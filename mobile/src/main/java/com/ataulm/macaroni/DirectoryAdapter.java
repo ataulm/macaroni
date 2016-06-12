@@ -40,7 +40,7 @@ class DirectoryAdapter extends RecyclerView.Adapter<DirectoryItemViewHolder> {
     @Override
     public long getItemId(int position) {
         DocumentInfo item = items.get(position);
-        return idMapper.getId(item.getName());
+        return idMapper.getId(item.getId());
     }
 
     private static class StableStringToIdMapper {

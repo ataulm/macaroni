@@ -12,9 +12,9 @@ import java.util.List;
 
 class DocumentInfoProvider {
 
-    private static final String[] PROJECTION_DOCUMENT_INFO = new String[]{Document.COLUMN_DISPLAY_NAME, Document.COLUMN_MIME_TYPE};
-    private final ContentResolver contentResolver;
+    private static final String[] PROJECTION_DOCUMENT_INFO = Column.projection();
 
+    private final ContentResolver contentResolver;
     DocumentInfoProvider(ContentResolver contentResolver) {
         this.contentResolver = contentResolver;
     }
@@ -46,11 +46,20 @@ class DocumentInfoProvider {
         cursor.moveToFirst();
         List<DocumentInfo> items = new ArrayList<>();
         do {
-            DocumentInfo entry = new DocumentInfo(cursor.getString(0), cursor.getString(1));
+            DocumentInfo entry = new DocumentInfo(
+                    getString(Column.DOCUMENT_ID, cursor),
+                    getString(Column.DISPLAY_NAME, cursor),
+                    getString(Column.MIME_TYPE, cursor)
+            );
+
             items.add(entry);
         } while (cursor.moveToNext());
 
         return items;
+    }
+
+    private String getString(Column column, Cursor cursor) {
+        return cursor.getString(column.positionProjection());
     }
 
     private boolean empty(Cursor childDocumentsCursor) {
@@ -61,6 +70,32 @@ class DocumentInfoProvider {
         if (cursor != null) {
             cursor.close();
         }
+    }
+
+    private enum Column {
+
+        DOCUMENT_ID(Document.COLUMN_DOCUMENT_ID),
+        DISPLAY_NAME(Document.COLUMN_DISPLAY_NAME),
+        MIME_TYPE(Document.COLUMN_MIME_TYPE);
+
+        private final String name;
+
+        Column(String name) {
+            this.name = name;
+        }
+
+        public static String[] projection() {
+            String[] projection = new String[values().length];
+            for (int i = 0; i < values().length; i++) {
+                projection[i] = values()[i].name;
+            }
+            return projection;
+        }
+
+        public int positionProjection() {
+            return ordinal();
+        }
+
     }
 
 }
