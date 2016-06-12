@@ -13,13 +13,18 @@
       android:layout_gravity="center"
       android:text="find audio" />
 
-
     <Button
       android:onClick="findAudioDir"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="center"
       android:text="find audio dir" />
+
+    <android.support.v7.widget.RecyclerView
+      android:id="@+id/directory_recycler_view"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
+
   </LinearLayout>
 
 </merge>
