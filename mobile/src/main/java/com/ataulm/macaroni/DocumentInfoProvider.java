@@ -19,26 +19,26 @@ class DocumentInfoProvider {
         this.contentResolver = contentResolver;
     }
 
-    List<DocumentInfo> getDocumentsInDirectory(Uri directoryUri) {
-        Uri childDocumentsUri = createUriForChildDocuments(directoryUri);
+    List<DocumentInfo> getDocumentsInDirectory(Uri directoryTreeUri) {
+        Uri childDocumentsUri = createUriForChildDocuments(directoryTreeUri);
         Cursor childDocumentsCursor = queryForDocuments(childDocumentsUri);
         try {
-            return marshallCursorToList(childDocumentsCursor);
+            return marshallCursorToList(directoryTreeUri, childDocumentsCursor);
         } finally {
             close(childDocumentsCursor);
         }
     }
 
-    private Uri createUriForChildDocuments(Uri uri) {
-        String treeDocumentId = DocumentsContract.getTreeDocumentId(uri);
-        return DocumentsContract.buildChildDocumentsUriUsingTree(uri, treeDocumentId);
+    private Uri createUriForChildDocuments(Uri treeUri) {
+        String treeDocumentId = DocumentsContract.getTreeDocumentId(treeUri);
+        return DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, treeDocumentId);
     }
 
     private Cursor queryForDocuments(Uri childDocumentsUri) {
         return contentResolver.query(childDocumentsUri, PROJECTION_DOCUMENT_INFO, null, null, null);
     }
 
-    private List<DocumentInfo> marshallCursorToList(Cursor cursor) {
+    private List<DocumentInfo> marshallCursorToList(Uri treeUri, Cursor cursor) {
         if (empty(cursor)) {
             return Collections.emptyList();
         }
@@ -48,6 +48,7 @@ class DocumentInfoProvider {
         do {
             DocumentInfo entry = new DocumentInfo(
                     getString(Column.DOCUMENT_ID, cursor),
+                    getDocumentUri(treeUri, cursor),
                     getString(Column.DISPLAY_NAME, cursor),
                     getString(Column.MIME_TYPE, cursor)
             );
@@ -58,12 +59,17 @@ class DocumentInfoProvider {
         return items;
     }
 
+    private boolean empty(Cursor childDocumentsCursor) {
+        return childDocumentsCursor == null || childDocumentsCursor.getCount() == 0;
+    }
+
     private String getString(Column column, Cursor cursor) {
         return cursor.getString(column.positionProjection());
     }
 
-    private boolean empty(Cursor childDocumentsCursor) {
-        return childDocumentsCursor == null || childDocumentsCursor.getCount() == 0;
+    private Uri getDocumentUri(Uri treeUri, Cursor cursor) {
+        String documentId = getString(Column.DOCUMENT_ID, cursor);
+        return DocumentsContract.buildDocumentUriUsingTree(treeUri, documentId);
     }
 
     private void close(Cursor cursor) {

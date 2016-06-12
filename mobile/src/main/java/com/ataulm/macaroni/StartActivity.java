@@ -1,6 +1,8 @@
 package com.ataulm.macaroni;
 
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,9 +10,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import java.io.IOException;
 import java.util.List;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class StartActivity extends BaseActivity {
@@ -18,6 +20,7 @@ public class StartActivity extends BaseActivity {
     private static final int REQUEST_CODE_PICK_DIR = 456;
 
     private DirectoryAdapter directoryAdapter;
+    private MediaPlayer mediaPlayer = new MediaPlayer();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,7 +30,7 @@ public class StartActivity extends BaseActivity {
         directoryAdapter = new DirectoryAdapter(new DirectoryItemViewHolder.Listener() {
             @Override
             public void onClick(DocumentInfo item) {
-                toast("clicked " + item.getName());
+                play(item);
             }
         });
 
@@ -60,6 +63,42 @@ public class StartActivity extends BaseActivity {
         DocumentInfoProvider documentInfoProvider = new DocumentInfoProvider(getContentResolver());
         List<DocumentInfo> documentsInDirectory = documentInfoProvider.getDocumentsInDirectory(uri);
         directoryAdapter.updateItems(documentsInDirectory);
+    }
+
+    private void play(DocumentInfo item) {
+        // TODO: check if the item is audio!
+        toast("clicked " + item.getName());
+
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+        }
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            mediaPlayer.setDataSource(this, item.getUri());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mediaPlayer.start();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mediaPlayer = new MediaPlayer();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mediaPlayer.stop();
+        mediaPlayer.release();
+        mediaPlayer = null;
     }
 
 }
