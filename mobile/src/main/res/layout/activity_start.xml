@@ -7,18 +7,11 @@
     android:orientation="vertical">
 
     <Button
-      android:onClick="findAudio"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:text="find audio" />
-
-    <Button
       android:onClick="findAudioDir"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="center"
-      android:text="find audio dir" />
+      android:text="find audio" />
 
     <android.support.v7.widget.RecyclerView
       android:id="@+id/directory_recycler_view"
