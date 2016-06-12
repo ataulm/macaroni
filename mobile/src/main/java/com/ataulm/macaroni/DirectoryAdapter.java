@@ -10,13 +10,13 @@ class DirectoryAdapter extends RecyclerView.Adapter<DirectoryItemViewHolder> {
 
     private final StableStringToIdMapper idMapper = new StableStringToIdMapper();
 
-    private List<DirectoryItem> items;
+    private List<DocumentInfo> items;
 
     public DirectoryAdapter() {
         super.setHasStableIds(true);
     }
 
-    public void updateItems(List<DirectoryItem> items) {
+    public void updateItems(List<DocumentInfo> items) {
         this.items = items;
         notifyDataSetChanged();
     }
@@ -28,7 +28,7 @@ class DirectoryAdapter extends RecyclerView.Adapter<DirectoryItemViewHolder> {
 
     @Override
     public void onBindViewHolder(DirectoryItemViewHolder holder, int position) {
-        DirectoryItem item = items.get(position);
+        DocumentInfo item = items.get(position);
         holder.bind(item);
     }
 
@@ -39,7 +39,7 @@ class DirectoryAdapter extends RecyclerView.Adapter<DirectoryItemViewHolder> {
 
     @Override
     public long getItemId(int position) {
-        DirectoryItem item = items.get(position);
+        DocumentInfo item = items.get(position);
         return idMapper.getId(item.getName());
     }
 

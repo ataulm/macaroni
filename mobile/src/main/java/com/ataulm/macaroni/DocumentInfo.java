@@ -1,11 +1,11 @@
 package com.ataulm.macaroni;
 
-class DirectoryItem {
+class DocumentInfo {
 
     private final String name;
     private final String mimeType;
 
-    public DirectoryItem(String name, String mimeType) {
+    public DocumentInfo(String name, String mimeType) {
         this.name = name;
         this.mimeType = mimeType;
     }
@@ -27,7 +27,7 @@ class DirectoryItem {
             return false;
         }
 
-        DirectoryItem that = (DirectoryItem) o;
+        DocumentInfo that = (DocumentInfo) o;
 
         if (!name.equals(that.name)) {
             return false;

@@ -1,18 +1,15 @@
 package com.ataulm.macaroni;
 
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
 import android.provider.OpenableColumns;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -25,6 +22,7 @@ public class StartActivity extends BaseActivity {
 
     @BindView(R.id.directory_recycler_view)
     RecyclerView directoriesView;
+
     private DirectoryAdapter directoryAdapter;
 
     @Override
@@ -75,45 +73,9 @@ public class StartActivity extends BaseActivity {
     }
 
     void updateDirectoryEntries(Uri uri) {
-        ContentResolver contentResolver = getContentResolver();
-        Uri docUri = DocumentsContract.buildDocumentUriUsingTree(uri, DocumentsContract.getTreeDocumentId(uri));
-        Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(uri, DocumentsContract.getTreeDocumentId(uri));
-
-        Cursor docCursor = contentResolver.query(
-                docUri,
-                new String[]{DocumentsContract.Document.COLUMN_DISPLAY_NAME, DocumentsContract.Document.COLUMN_MIME_TYPE},
-                null,
-                null,
-                null
-        );
-
-        try {
-            while (docCursor.moveToNext()) {
-                log("found doc =" + docCursor.getString(0) + ", mime=" + docCursor.getString(1));
-            }
-        } finally {
-            close(docCursor);
-        }
-
-        Cursor childCursor = contentResolver.query(
-                childrenUri,
-                new String[]{DocumentsContract.Document.COLUMN_DISPLAY_NAME, DocumentsContract.Document.COLUMN_MIME_TYPE},
-                null,
-                null,
-                null
-        );
-
-        try {
-            List<DirectoryItem> directoryEntries = new ArrayList<>();
-            while (childCursor.moveToNext()) {
-                log("found child=" + childCursor.getString(0) + ", mime=" + childCursor.getString(1));
-                DirectoryItem entry = new DirectoryItem(childCursor.getString(0), childCursor.getString(1));
-                directoryEntries.add(entry);
-            }
-            directoryAdapter.updateItems(directoryEntries);
-        } finally {
-            close(childCursor);
-        }
+        DocumentInfoProvider documentInfoProvider = new DocumentInfoProvider(getContentResolver());
+        List<DocumentInfo> documentsInDirectory = documentInfoProvider.getDocumentsInDirectory(uri);
+        directoryAdapter.updateItems(documentsInDirectory);
     }
 
     public void dumpImageMetaData(Uri uri) {

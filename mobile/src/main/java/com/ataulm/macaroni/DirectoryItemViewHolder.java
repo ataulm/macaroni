@@ -25,7 +25,7 @@ class DirectoryItemViewHolder extends RecyclerView.ViewHolder {
         ButterKnife.bind(this, itemView);
     }
 
-    public void bind(DirectoryItem item) {
+    public void bind(DocumentInfo item) {
         nameTextView.setText(item.getName());
     }
 

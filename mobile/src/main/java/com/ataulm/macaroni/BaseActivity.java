@@ -9,7 +9,7 @@ public class BaseActivity extends AppCompatActivity {
     private Toast toast;
 
     protected void log(String message) {
-        Log.d("!!!", message);
+        MacaroniApplication.log(message);
     }
 
     protected void toast(String message) {
