@@ -17,16 +17,12 @@ public class StartActivity extends BaseActivity {
 
     private static final int REQUEST_CODE_PICK_DIR = 456;
 
-    @BindView(R.id.directory_recycler_view)
-    RecyclerView directoriesView;
-
     private DirectoryAdapter directoryAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-        ButterKnife.bind(this);
 
         directoryAdapter = new DirectoryAdapter(new DirectoryItemViewHolder.Listener() {
             @Override
@@ -34,8 +30,10 @@ public class StartActivity extends BaseActivity {
                 toast("clicked " + item.getName());
             }
         });
-        directoriesView.setLayoutManager(new LinearLayoutManager(this));
-        directoriesView.setAdapter(directoryAdapter);
+
+        RecyclerView directoryView = ButterKnife.findById(this, R.id.directory_recycler_view);
+        directoryView.setLayoutManager(new LinearLayoutManager(this));
+        directoryView.setAdapter(directoryAdapter);
     }
 
     public void findAudioDir(View view) {
